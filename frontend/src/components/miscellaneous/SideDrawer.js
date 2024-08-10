@@ -36,11 +36,13 @@ function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
+  console.log("🚀 ~ SideDrawer ~ loading:", loading);
   const [loadingChat, setLoadingChat] = useState(false);
 
   const {
     setSelectedChat,
     user,
+    setUser,
     notification,
     setNotification,
     chats,
@@ -53,23 +55,55 @@ function SideDrawer() {
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
+    setUser(null);
     history.push("/");
   };
 
-  const handleSearch = async () => {
-    if (!search) {
-      toast({
-        title: "Please Enter something in search",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top-left",
-      });
+  // const handleSearch = async () => {
+  //   if (!search) {
+  //     toast({
+  //       title: "Please Enter something in search",
+  //       status: "warning",
+  //       duration: 5000,
+  //       isClosable: true,
+  //       position: "top-left",
+  //     });
+  //     setLoading(false); // Ensure loading is set to false if there's no search term
+  //     return;
+  //   }
+
+  //   try {
+  //     const config = {
+  //       headers: {
+  //         Authorization: `Bearer ${user.token}`,
+  //       },
+  //     };
+
+  //     const { data } = await axios.get(`/api/user?search=${search}`, config);
+
+  //     setSearchResult(data);
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error Occured!",
+  //       description: "Failed to Load the Search Results",
+  //       status: "error",
+  //       duration: 5000,
+  //       isClosable: true,
+  //       position: "bottom-left",
+  //     });
+  //   } finally {
+  //     setLoading(false); // Ensure loading is set to false after the search is completed
+  //   }
+  // };
+  const handleSearch = async (searchValue) => {
+    if (!searchValue) {
+      setSearchResult([]);
+      setLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
+      setLoading(true); // Set loading to true before the search starts
 
       const config = {
         headers: {
@@ -77,19 +111,23 @@ function SideDrawer() {
         },
       };
 
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axios.get(
+        `/api/user?search=${searchValue}`,
+        config
+      );
 
-      setLoading(false);
       setSearchResult(data);
     } catch (error) {
       toast({
-        title: "Error Occured!",
+        title: "Error Occurred!",
         description: "Failed to Load the Search Results",
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "bottom-left",
       });
+    } finally {
+      setLoading(false); // Ensure loading is set to false after the search is completed
     }
   };
 
@@ -196,13 +234,33 @@ function SideDrawer() {
           <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
           <DrawerBody>
             <Box d="flex" pb={2}>
+              {/* <Input
+                placeholder="Search by name or email"
+                mr={2}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setLoading(true); // Set loading to true when typing
+
+                  // Optionally, you can add a debounce or delay here to control when the search is triggered
+                  setTimeout(() => {
+                    if (e.target.value.trim() === "") {
+                      setLoading(false); // If input is cleared, reset loading
+                    }
+                  }, 300);
+                }}
+              /> */}
               <Input
                 placeholder="Search by name or email"
                 mr={2}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  const searchValue = e.target.value;
+                  setSearch(searchValue);
+                  handleSearch(searchValue); // Dynamically search as the user types
+                }}
               />
-              <Button onClick={handleSearch}>Go</Button>
+              <Button onClick={() => handleSearch(search)}>Go</Button>
             </Box>
             {loading ? (
               <ChatLoading />

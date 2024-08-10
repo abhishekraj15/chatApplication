@@ -9,15 +9,16 @@ const ChatProvider = ({ children }) => {
   const [notification, setNotification] = useState([]);
   const [chats, setChats] = useState();
 
-  const history = useHistory();
+  // const history = useHistory();
 
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    setUser(userInfo);
+  // useEffect(() => {
+  //   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  //   console.log("🚀 ~ useEffect ~ userInfo:", userInfo);
+  //   setUser(userInfo);
 
-    if (!userInfo) history.push("/");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history]);
+  //   if (!userInfo) history.push("/");
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [history]);
 
   return (
     <ChatContext.Provider
